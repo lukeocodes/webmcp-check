@@ -25,8 +25,8 @@ Every discovered tool is validated against the WebMCP `ModelContextTool` contrac
 ## Running locally
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Runtime detection needs a Chromium binary:
