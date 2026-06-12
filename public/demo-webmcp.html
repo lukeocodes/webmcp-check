@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WebMCP demo target</title>
+  <style>
+    body { font: 16px/1.6 system-ui, sans-serif; max-width: 40rem; margin: 4rem auto; padding: 0 1rem; background: #0a0a0f; color: #e7e7ea; }
+    code { background: #1a1a22; padding: 0 .3em; border-radius: 4px; }
+    a { color: #818cf8; }
+    fieldset { border: 1px solid #333; border-radius: 8px; margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <h1>WebMCP demo target</h1>
+  <p>
+    This page exists so <a href="/">WebMCP Check</a> has a known-good target. It registers
+    tools through both WebMCP APIs — the imperative <code>navigator.modelContext</code> and a
+    declarative <code>&lt;form toolname&gt;</code>.
+  </p>
+
+  <!-- Declarative API: the browser synthesizes a tool from this form. -->
+  <form toolname="search-products"
+        tooldescription="Search the product catalog by keyword and optional maximum price."
+        toolautosubmit
+        action="#" method="get">
+    <fieldset>
+      <legend>search-products (declarative)</legend>
+      <p><label>Query <input type="text" name="query" toolparamdescription="Search keywords" required></label></p>
+      <p><label>Max price <input type="number" name="maxPrice" toolparamdescription="Maximum price in USD" min="0"></label></p>
+      <button type="submit">Search</button>
+    </fieldset>
+  </form>
+
+  <script>
+    // Imperative API: register tools once the page loads, exactly as a real WebMCP site would.
+    function registerWebMCPTools() {
+      const ctx = navigator.modelContext || document.modelContext;
+      if (!ctx || typeof ctx.registerTool !== "function") return;
+
+      ctx.registerTool({
+        name: "add-to-cart",
+        title: "Add to cart",
+        description: "Add a product to the shopping cart by its SKU and quantity.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            sku: { type: "string", description: "The product SKU" },
+            quantity: { type: "number", description: "How many to add", minimum: 1 },
+          },
+          required: ["sku"],
+        },
+        annotations: { readOnlyHint: false },
+        execute: async ({ sku, quantity = 1 }) => ({ ok: true, sku, quantity }),
+      });
+
+      ctx.registerTool({
+        name: "get-cart",
+        title: "Get cart",
+        description: "Return the current contents of the shopping cart.",
+        inputSchema: { type: "object", properties: {} },
+        annotations: { readOnlyHint: true },
+        execute: async () => ({ items: [] }),
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", registerWebMCPTools);
+    } else {
+      registerWebMCPTools();
+    }
+  </script>
+</body>
+</html>
