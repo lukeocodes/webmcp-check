@@ -10,7 +10,11 @@ const VERDICT_META: Record<Verdict, { label: string; cls: string; dot: string }>
   error: { label: "Error", cls: "border-red-500/40 bg-red-500/10 text-red-300", dot: "bg-red-400" },
 };
 
-const EXAMPLES = ["github.com", "vercel.com", "example.com"];
+const EXAMPLES = [
+  "webmcp-check.vercel.app/demo-webmcp.html",
+  "webmcp.dev",
+  "example.com",
+];
 
 export default function Checker() {
   const [url, setUrl] = useState("");
