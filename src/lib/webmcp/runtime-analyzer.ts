@@ -118,12 +118,21 @@ async function launchBrowser(): Promise<Browser> {
   const onServerless = !!(process.env.VERCEL_ENV || process.env.AWS_LAMBDA_FUNCTION_NAME);
 
   if (onServerless) {
+    // @sparticuz/chromium only inflates its shared-library pack (libnss3, etc.) and
+    // sets LD_LIBRARY_PATH when it detects an AWS Lambda Node 20/22 runtime via
+    // AWS_EXECUTION_ENV / AWS_LAMBDA_JS_RUNTIME. Vercel runs on Lambda but doesn't
+    // set those, so without this the binary extracts but fails with
+    // "libnss3.so: cannot open shared object file". Force the detection *before*
+    // importing the package so its module-load env setup runs.
+    if (!process.env.AWS_EXECUTION_ENV && !process.env.AWS_LAMBDA_JS_RUNTIME) {
+      process.env.AWS_LAMBDA_JS_RUNTIME = "nodejs20.x";
+    }
     const chromium = (await import("@sparticuz/chromium")).default;
     return puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
-      headless: true,
+      headless: chromium.headless,
     });
   }
 
