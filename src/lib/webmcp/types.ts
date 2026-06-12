@@ -72,4 +72,6 @@ export interface CheckResult {
   summary: string[];
   timings: { totalMs: number };
   checkedAt: string;
+  /** True when this response was served from the server-side cache. */
+  cached?: boolean;
 }

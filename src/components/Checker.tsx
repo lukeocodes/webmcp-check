@@ -115,8 +115,18 @@ function ResultView({ result }: { result: CheckResult }) {
             <span className={`h-2 w-2 rounded-full ${meta.dot}`} />
             {meta.label}
           </div>
-          <div className="text-xs text-zinc-500">
-            {result.runtimeExecuted ? "Ran in a headless browser" : "Static analysis only"} · {result.timings.totalMs} ms
+          <div className="flex items-center gap-2 text-xs text-zinc-500">
+            {result.cached && (
+              <span
+                title={`Result computed ${new Date(result.checkedAt).toLocaleString()}`}
+                className="rounded border border-white/10 bg-white/[0.03] px-1.5 py-0.5 text-zinc-400"
+              >
+                cached
+              </span>
+            )}
+            <span>
+              {result.runtimeExecuted ? "Ran in a headless browser" : "Static analysis only"} · {result.timings.totalMs} ms
+            </span>
           </div>
         </div>
 
